@@ -16,14 +16,38 @@ class SecondScreen(Screen):
     info= "Instruction \n tap when you \nsee the  same letter \nas two letter befor"
 
 class TestScreen(Screen):
+    lista=[]
+    minus=0
+    plus=0
+    expected=0
     def on_enter(self, *args):
-
         Clock.schedule_interval(self.update, 0.5)
     def update(self, *args):
         tekst=self.ids['letter']
-        alfabet=['a','s','d','f','h','j','k']
-        poz=random.randint(0,len(alfabet)-1)
-        tekst.text=alfabet[poz]
+        # zakres liter w chr jest od 65-90 ale biorac tak dlugi zakres, rzadko beda sie powtarzac
+        #wezmy 10 pierwszych liter
+        liter=chr(random.randint(65,75))
+        tekst.text=liter
+        self.lista.append(liter)
+        print self.lista
+        if len(self.lista)==20:
+            Clock.unschedule(self.update)
+            root_widget.current = 'menu'
+            self.lista=[]
+            print 'You missed: ', str(self.expected-self.plus)
+            self.expected=0
+        if len(self.lista)>2:
+            if self.lista[-1] == self.lista[-3]:
+                self.expected+=1
+    def on_touch_down(self, touch):
+        if self.lista[-1] == self.lista[-3]:
+            self.plus+=1
+        else:
+            self.minus-=1
+        print 'poprawnych: ',str(self.plus), ' niepoprawnych: ', str(self.minus)
+
+
+
 
 root_widget = Builder.load_string('''
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
