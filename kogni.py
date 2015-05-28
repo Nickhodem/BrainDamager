@@ -5,9 +5,9 @@ from kivy.app import App
 from kivy.base import runTouchApp
 from kivy.lang import Builder
 from kivy.properties import ListProperty
-from kivy.uix.boxlayout import BoxLayout
+from kivy.clock import Clock
 from kivy.uix.screenmanager import ScreenManager, Screen,RiseInTransition,FallOutTransition,WipeTransition ,FadeTransition,SlideTransition,SwapTransition
-
+import random
 class MyScreenManager(ScreenManager):
     pass
 class FirstScreen(Screen):
@@ -16,7 +16,15 @@ class SecondScreen(Screen):
     info= "Instruction \n tap when you \nsee the  same letter \nas two letter befor"
 
 class TestScreen(Screen):
-    pass
+    def on_enter(self, *args):
+
+        Clock.schedule_interval(self.update, 0.5)
+    def update(self, *args):
+        tekst=self.ids['letter']
+        alfabet=['a','s','d','f','h','j','k']
+        poz=random.randint(0,len(alfabet)-1)
+        tekst.text=alfabet[poz]
+
 root_widget = Builder.load_string('''
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 #:import SlideTransition kivy.uix.screenmanager.SlideTransition
@@ -67,7 +75,14 @@ MyScreenManager:
         padding: 10,10,10,10
         spacing: 10
         Label:
+            size_hint: 1,0.1
             text:"tap"
+        Label:
+            id: letter
+            size_hint: 1,1
+            text: "letter"
+
+
 ''')
 
 
