@@ -2,16 +2,25 @@
 how fast is your brain? are you ready for challange?
 '''
 from kivy.app import App
-from kivy.base import runTouchApp
 from kivy.lang import Builder
-from kivy.properties import ListProperty
 from kivy.clock import Clock
 from kivy.uix.screenmanager import ScreenManager, Screen,RiseInTransition,FallOutTransition,WipeTransition ,FadeTransition,SlideTransition,SwapTransition
 import random
+
+fps=1
 class MyScreenManager(ScreenManager):
     pass
 class FirstScreen(Screen):
-    pass
+    def do_level(self, level):
+        global fps
+        if level=='easy':
+            fps=1
+        elif level =='medium':
+            fps=0.5
+        else:
+            fps=0.2
+        root_widget.current = 'info'
+        return fps
 class SecondScreen(Screen):
     info= "Instruction \n tap when you \nsee the  same letter \nas two letter befor"
 
@@ -21,7 +30,8 @@ class TestScreen(Screen):
     plus=0
     expected=0
     def on_enter(self, *args):
-        Clock.schedule_interval(self.update, 0.5)
+        print str(fps)
+        Clock.schedule_interval(self.update, fps)
     def update(self, *args):
         tekst=self.ids['letter']
         # zakres liter w chr jest od 65-90 ale biorac tak dlugi zakres, rzadko beda sie powtarzac
@@ -30,7 +40,7 @@ class TestScreen(Screen):
         tekst.text=liter
         self.lista.append(liter)
         print self.lista
-        if len(self.lista)==20:
+        if len(self.lista)==30:
             Clock.unschedule(self.update)
             root_widget.current = 'menu'
             self.lista=[]
@@ -71,15 +81,23 @@ MyScreenManager:
         spacing: 10
         Label:
             text: "Welcome to Brain Challenge"
-        Button:
-            text: 'START'
-            on_release: app.root.current = 'info'
+            color: 0,1,0.9411,1
+            bold: True
         Button:
             text: 'easy'
+            color: 0,1,0.9411,1
+            background_color: 0, 0.5019, 0.8784, 1
+            on_press: root.do_level('easy')
         Button:
             text: 'medium'
+            color: 0,1,0.9411,1
+            background_color: 0,0.5019,0.8784,1
+            on_press: root.do_level('medium')
         Button:
             text: 'hard'
+            color: 0,1,0.9411,1
+            background_color: 0,0.5019,0.8784,1
+            on_press: root.do_level('hard')
 <SecondScreen>:
     name: 'info'
     BoxLayout:
@@ -105,8 +123,9 @@ MyScreenManager:
             id: letter
             size_hint: 1,1
             text: "letter"
-
-
+            bold: True
+            color: 1,1,1,1
+            font_size: 24
 ''')
 
 
