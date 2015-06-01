@@ -8,6 +8,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen,RiseInTransition,FallOu
 import random
 
 fps=1
+score=[0,0,0]
 class MyScreenManager(ScreenManager):
     pass
 class FirstScreen(Screen):
@@ -31,30 +32,61 @@ class TestScreen(Screen):
     expected=0
     def on_enter(self, *args):
         print str(fps)
+        self.update_score()
         Clock.schedule_interval(self.update, fps)
     def update(self, *args):
         tekst=self.ids['letter']
         # zakres liter w chr jest od 65-90 ale biorac tak dlugi zakres, rzadko beda sie powtarzac
         #wezmy 10 pierwszych liter
-        liter=chr(random.randint(65,75))
+        liter=chr(random.randint(65,67))
         tekst.text=liter
+        tekst.color=[random.random(),random.random(),random.random(),1]
         self.lista.append(liter)
         print self.lista
-        if len(self.lista)==30:
+        if len(self.lista)==10:
             Clock.unschedule(self.update)
-            root_widget.current = 'menu'
+            root_widget.current = 'wynik'
             self.lista=[]
+            global score
+
             print 'You missed: ', str(self.expected-self.plus)
+            print 'wrong: ', str(-1*self.minus)
+            print 'right: ', str(self.plus)
+            score=[self.expected, self.plus, self.minus]
+            for i in score:
+                i=0
+
+                print i
+            #return score
+
             self.expected=0
+            self.plus=0
+            self.minus=0
+
         if len(self.lista)>2:
             if self.lista[-1] == self.lista[-3]:
                 self.expected+=1
+    def update_score(self):
+        good=self.ids['plus']
+        good.text='right: '+str(self.plus)
+        schelcht=self.ids['minus']
+        schelcht.text='wrong: '+str(self.minus)
     def on_touch_down(self, touch):
-        if self.lista[-1] == self.lista[-3]:
-            self.plus+=1
-        else:
-            self.minus-=1
-        print 'poprawnych: ',str(self.plus), ' niepoprawnych: ', str(self.minus)
+        if len(self.lista)>2:
+            if self.lista[-1] == self.lista[-3]:
+                self.plus+=1
+            else:
+                self.minus-=1
+            print 'poprawnych: ',str(self.plus), ' niepoprawnych: ', str(self.minus)
+        self.update_score()
+
+class ScoreBoard(Screen):
+    global score
+    tekst='Score board\n '+str(score)
+
+    def on_touch_down(self, touch):
+        root_widget.current = 'menu'
+
 
 
 
@@ -72,6 +104,7 @@ MyScreenManager:
     FirstScreen:
     SecondScreen:
     TestScreen:
+    ScoreBoard:
 
 <FirstScreen>:
     name: 'menu'
@@ -114,18 +147,33 @@ MyScreenManager:
     name: 'test'
     BoxLayout:
         orientation: 'vertical'
-        padding: 10,10,10,10
-        spacing: 10
-        Label:
+        BoxLayout:
+            orientation: 'horizontal'
             size_hint: 1,0.1
-            text:"tap"
-        Label:
-            id: letter
+            Label:
+                id: plus
+                text: 'right: 0'
+            Label:
+                text:"tap"
+            Label:
+                id: minus
+                text:'wrong: 0'
+
+        BoxLayout:
+            orientation: 'vertical'
             size_hint: 1,1
-            text: "letter"
-            bold: True
-            color: 1,1,1,1
-            font_size: 24
+            Label:
+                id: letter
+                text: "letter"
+                bold: True
+                font_size: 24
+<ScoreBoard>:
+    name: 'wynik'
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: root.tekst
+
 ''')
 
 
