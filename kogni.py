@@ -31,6 +31,9 @@ class TestScreen(Screen):
     plus=0
     expected=0
     def on_enter(self, *args):
+        self.expected=0
+        self.plus=0
+        self.minus=0
         print str(fps)
         self.update_score()
         Clock.schedule_interval(self.update, fps)
@@ -38,7 +41,7 @@ class TestScreen(Screen):
         tekst=self.ids['letter']
         # zakres liter w chr jest od 65-90 ale biorac tak dlugi zakres, rzadko beda sie powtarzac
         #wezmy 10 pierwszych liter
-        liter=chr(random.randint(65,67))
+        liter=chr(random.randint(65,70))
         tekst.text=liter
         tekst.color=[random.random(),random.random(),random.random(),1]
         self.lista.append(liter)
@@ -53,16 +56,7 @@ class TestScreen(Screen):
             print 'wrong: ', str(-1*self.minus)
             print 'right: ', str(self.plus)
             score=[self.expected, self.plus, self.minus]
-            for i in score:
-                i=0
-
-                print i
-            #return score
-
-            self.expected=0
-            self.plus=0
-            self.minus=0
-
+            return score
         if len(self.lista)>2:
             if self.lista[-1] == self.lista[-3]:
                 self.expected+=1
@@ -83,7 +77,7 @@ class TestScreen(Screen):
 class ScoreBoard(Screen):
     global score
     tekst='Score board\n '+str(score)
-
+    print score
     def on_touch_down(self, touch):
         root_widget.current = 'menu'
 
