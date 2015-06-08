@@ -6,9 +6,13 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.screenmanager import ScreenManager, Screen,RiseInTransition,FallOutTransition,WipeTransition ,FadeTransition,SlideTransition,SwapTransition
 import random
-
+import json
 fps=1
-score=[0,0,0]
+score={
+    'pominiete':0,
+    'poprawne':0,
+    'niepoprawne':0
+}
 class MyScreenManager(ScreenManager):
     pass
 class FirstScreen(Screen):
@@ -41,25 +45,26 @@ class TestScreen(Screen):
         tekst=self.ids['letter']
         # zakres liter w chr jest od 65-90 ale biorac tak dlugi zakres, rzadko beda sie powtarzac
         #wezmy 10 pierwszych liter
-        liter=chr(random.randint(65,70))
+        liter=chr(random.randint(65,75))
         tekst.text=liter
         tekst.color=[random.random(),random.random(),random.random(),1]
         self.lista.append(liter)
         print self.lista
-        if len(self.lista)==10:
-            Clock.unschedule(self.update)
-            root_widget.current = 'wynik'
-            self.lista=[]
-            global score
-
-            print 'You missed: ', str(self.expected-self.plus)
-            print 'wrong: ', str(-1*self.minus)
-            print 'right: ', str(self.plus)
-            score=[self.expected, self.plus, self.minus]
-            return score
         if len(self.lista)>2:
             if self.lista[-1] == self.lista[-3]:
                 self.expected+=1
+        if len(self.lista)==5:
+            Clock.unschedule(self.update)
+            root_widget.current = 'wynik'
+            self.lista=[]
+            print 'You missed: ', str(self.expected-self.plus)
+            print 'wrong: ', str(-1*self.minus)
+            print 'right: ', str(self.plus)
+
+            score['pominiete']=self.expected-self.plus
+            score['poprawne']=self.plus
+            score['niepoprawne']=-1*self.minus
+            return score
     def update_score(self):
         good=self.ids['plus']
         good.text='right: '+str(self.plus)
@@ -73,17 +78,26 @@ class TestScreen(Screen):
                 self.minus-=1
             print 'poprawnych: ',str(self.plus), ' niepoprawnych: ', str(self.minus)
         self.update_score()
+    def double_touch(self):
+        tap=len(lista)
+        previous_tap
+        if tap==previous_tap:
+            
+            return True
+        else:
+            return False
+
 
 class ScoreBoard(Screen):
-    global score
-    tekst='Score board\n '+str(score)
-    print score
+
     def on_touch_down(self, touch):
         root_widget.current = 'menu'
 
-
-
-
+    def on_enter(self, *args):
+        naglowek=self.ids['header']
+        naglowek.text='Score board\n'+'pominietych liter: '+str(score['pominiete'])\
+                      +'\npoprawnych: '+str(score['poprawne'])\
+                      +'\nniepoprawnych: '+str(score['niepoprawne'])
 
 root_widget = Builder.load_string('''
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
@@ -165,8 +179,10 @@ MyScreenManager:
     name: 'wynik'
     orientation: 'vertical'
     BoxLayout:
+        orientation: 'vertical'
         Label:
-            text: root.tekst
+            id: header
+            text: 'score board'
 
 ''')
 
